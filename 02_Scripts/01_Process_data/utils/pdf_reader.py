@@ -45,25 +45,34 @@ class PdfExtractVariables:
         return databases_list, databases_descriptions
 
     def get_page_table(self, page):
-        table = camelot.read_pdf(self.dec_filename, pages=str(page))
+        table = camelot.read_pdf(self.dec_filename, pages=str(page),
+                                 copy_text='v')
 
-        if table.n > 0:
-            table = table[0].df
-        else:
-            # TODO how to recognize a one-line table?
-            pass
-        return table
+        if table.n == 0:
+            table = camelot.read_pdf(self.dec_filename, pages=str(page),
+                                     copy_text='v', line_scale=60)
+            if table.n == 0:
+                print("Could not find a table on page {} of pdf {} using lattice. Will attempt to use column "
+                      "coordinates provided.".format(page, self.dec_filename))
+                table = camelot.read_pdf(self.dec_filename, pages=str(page),
+                                         flavor='stream',
+                                         columns=['58.55,113.75,172.07,362.64,412.08,456.0,661.12'],
+                                         row_tol=1000, column_tol=1000)
+                if table.n == 0:
+                    raise Exception("Could not find a table on page {} of pdf {}.".format(page, self.dec_filename))
+        return table[0].df
 
     def get_databases(self, databases_list, databases_descriptions):
         # Create database dictionary
         databases = {}
 
-        # Create holding variables for running table
+        # Create holding variable for current table
         current_table = ''
 
+        # Loop over each page in the pdf
         for (page, (data_name, data_desc)) in enumerate(zip(databases_list, databases_descriptions)):
-            # Get table for current page
-            table = self.get_page_table(page=page + 1) # We add 1 as Camelot is not zero-based
+            # Get table for current page (we add 1 as Camelot is not zero-based)
+            table = self.get_page_table(page=page + 1)
 
             if data_name is not None:
                 databases[data_name] = [data_desc, table]
