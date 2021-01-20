@@ -1,0 +1,16 @@
+import mysql.connector
+
+print('[INFO] Connecting to server...')
+db = mysql.connector.connect(
+    host='172.105.149.169',
+    user='gandalf',
+    passwd='X%a96Pu73!Ai',
+    auth_plugin='mysql_native_password',
+    database='goku'
+)
+
+myCursor = db.cursor()
+myCursor.execute('')
+
+
+

@@ -1,9 +1,10 @@
 from config import get_dataset_config as config
 import json
 import os
-from dbfread import DBF
+import shapefile
 import pandas as pd
 import numpy as np
+
 
 # Get json dictionary input/output path
 input_path = config.VARIABLE_DICTIONARIES_PATH
@@ -20,14 +21,12 @@ for (database_name, database_content) in dictionary.items():
 
     # Loop over each data table in the database
     for (datatable_name, (datatable_desc, datatable_table)) in database_content.items():
-        # TODO
-        # Get dbf
-        # table = DBF(os.sep.join([data_path, 'AYUNTAMI.DBF']))
-        # Get df
-        # table = pd.DataFrame(iter(table))
+        # Get table path
+        path = os.sep.join([database_name, datatable_name, '.dbf'])
+
+        # Get table
+        sf = shapefile.Reader(path)
+        table = pd.DataFrame(sf.records())
+        # TODO clean
+
         pass
-
-
-data_path = '..\\..\\01_Data\\01_Raw_Data\\CNGMDT\\2019\\2_Integrantes_ayuntami_cngmd2019_dbf\\Bases_Datos'
-table = DBF(os.sep.join([data_path, 'COMISION.DBF']))
-table = pd.DataFrame(iter(table))
