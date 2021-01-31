@@ -17,6 +17,7 @@ for dataset in datasets_list:
     dataset_dir = dataset.split('.zip')[0]
 
     # TODO Add "if" in case there is only one folder
+        # I have done nothing
 
     # Extract files
     zip_data.extractall(dataset_dir)
